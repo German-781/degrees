@@ -91,132 +91,49 @@ def shortest_path(source, target):
 
     If no possible path, returns None.
     """
-    lista = set()
-    actores = set()
+
+    lista = []
+    actores = []
 
     fuente = source
+    partida = Node(state=fuente, parent=None, action=None)
 
+    actores.append(fuente) 
+
+    frontera = QueueFrontier()
+        
+    frontera.add(partida)
     final = False
 
-    proceso = 0
+    while final == False:
+
+            if frontera.empty():
+                print("frontera vacia ")
+                return None
+
+            nodo = frontera.remove()
+
+            actores.append(nodo.state)
     
-
-    while proceso < 2:
-
-        lista = []
-        actores = []
-
-        fuente = source
-
-        actores.append(fuente) 
-
-        final = False
-
-        proceso +=1
-
-        if proceso == 1:
-            frontera = StackFrontier()
-            final = False
-        else:
-            frontera = QueueFrontier()
-            final = False
-        
-        print("limpia")
-        largo = frontera.empty()
-        print(largo)
-
-        while final == False:
-    
-            neighbors = neighbors_for_person(fuente)
-
-            print("vecinos")
-            print(neighbors) 
+            neighbors = neighbors_for_person(nodo.state)
 
             vecinos = list(neighbors)
    
-            for e in vecinos:
-                print(e)
-                pelicula = e[0]
-               # print("pelicula", pelicula)
-                actor = e[1]
-               # print("actor", actor)
+            for pelicula, actor in vecinos:
 
-                estado = actor
-                padre = fuente   
-                accion = pelicula
+                if not frontera.contains_state(actor) and actor not in actores: 
+                    nodo_actual = Node(state= actor, parent=nodo, action= pelicula)
 
-                if estado == target:
-                    lista.append((accion, estado)) 
-                    print("par: ", lista)
-                #    actores.add(sale.state)
-                    final = True
-                    print("fin")
-                else:
-                    nodo = Node(estado, padre, accion)
-                    #print("nodo:",nodo.state)
-                    if frontera.contains_state(nodo.state):
-                        continue
-                    else:
-                        if nodo.state in (actores):
-                            print("en actor")
-                            continue
-                        else:
-                            frontera.add(nodo)
+                    if nodo_actual.state == target:
+                        while nodo_actual.parent is not None:
+                            lista.append((nodo_actual.action, nodo_actual.state)) 
+                            nodo_actual = nodo_actual.parent
+                        lista.reverse()
+                        return lista
+                    
+                    frontera.add(nodo_actual)
 
-            if final == False:
-
-            #    ultimo = len.frontier()
-            #    if ultimo == 1:
-            #        print("no encontro relacion")
-                sale = frontera.remove()
-                fuente = sale.state
-                lista.append((sale.action, sale.state))
-                actores.append(sale.state)
-                print("remove:")
-                print(sale.state)
-                print(sale.action)
-
-                #if empty:
-                #    print("frontera vacia: no encontro relación")    
-
-            else:
-                print("actores: ", actores)
-                print("proceso: ", proceso)
-                if proceso == 2:
-                    fifo = len(lista)
-                    print("fifo : ",fifo)
-                    lista_fifo = lista
-                else:
-                    lifo = len(lista)
-                    print("lifo : ",lifo)
-                    lista_lifo = lista
-
-    if fifo < lifo:
-        print(" el camino más corto es fifo : ", fifo, " peliculas" )
-        print(lista_fifo)
-        print(" camino lifo : ", lifo, " peliculas" )
-        print(lista_lifo)
-    else:
-        if fifo > lifo:
-            print(" el camino más corto es lifo : ", lifo, " peliculas" )
-            print(lista_lifo)
-            print(" camino fifo : ", fifo, " peliculas" )
-            print(lista_fifo)
-        else:
-            print(" los dos caminos son iguales")
-            print(" camino fifo : ", fifo, " peliculas" )
-            print(lista_fifo)
-            print(" camino lifo : ", lifo, " peliculas" )
-            print(lista_lifo)
-
-    #if empty():
-    #    raise ValueError()("Frontera vacia")
-
-Exception()      
-print("frontera vacia")
-
-    # TODO
-    #   raise NotImplementedError
+       #raise NotImplementedError
 
 def lista_film(actor):
     return any(node.state == state for node in self.frontier)
@@ -248,6 +165,7 @@ def person_id_for_name(name):
 
 
 def neighbors_for_person(person_id):
+
     """
     Returns (movie_id, person_id) pairs for people
     who starred with a given person.
